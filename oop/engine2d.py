@@ -7,13 +7,21 @@ class Circle:
         self.color = 'black'
 
     def __repr__(self):
-        return f'{self.__class__.__name__} ({self.x}, {self.y}) with radius {self.radius} and color {self.color}'
+        return f'Circle ({self.x}, {self.y}) with radius {self.radius} and color {self.color}'
+
+    def __setattr__(self, key, value):
+        if key == 'radius':
+            if not value:
+                raise AttributeError("Radius can't be empty")
+            elif value <= 0:
+                raise AttributeError("Radius can't be negative!")
+        self.__dict__[key] = value
 
     def draw(self):
         if self.color == 'black':
-            print(f'Drawing Circle: ({self.x} {self.y}) with radius {self.radius}')
+            print(f'Drawing Circle: ({self.x}, {self.y}) with radius {self.radius}')
         else:
-            print(f'Drawing Circle: ({self.x} {self.y}) with radius {self.radius}, color - {self.color}')
+            print(f'Drawing Circle: ({self.x}, {self.y}) with radius {self.radius}, color - {self.color}')
 
 
 class Triangle:
@@ -22,9 +30,14 @@ class Triangle:
         self.point2 = (x2, y2)
         self.point3 = (x3, y3)
         self.color = 'black'
+        self.validate_points()
 
     def __repr__(self):
-        return f'{self.__class__.__name__}: ({self.point1}, {self.point2}, {self.point3}) and color {self.color}'
+        return f'Triangle: ({self.point1}, {self.point2}, {self.point3}) and color {self.color}'
+
+    def validate_points(self):
+        if self.point1 == self.point2 or self.point1 == self.point3 or self.point2 == self.point3:
+            raise ValueError('Points should not be equal!')
 
     def draw(self):
         if self.color == 'black':
@@ -41,8 +54,26 @@ class Rectangle:
         self.color = 'black'
 
     def __repr__(self):
-        return f'{self.__class__.__name__} from {self.start_point} sides: {self.width} x {self.height}' \
+        return f'Rectangle from {self.start_point} sides: {self.width} x {self.height}' \
                f' and color {self.color}'
+
+    def __setattr__(self, key, value):
+        if key == 'width':
+            if not value:
+                raise AttributeError("Width can't be empty")
+            elif not isinstance(value, int):
+                raise AttributeError("Width must be int!")
+            elif int(value) <= 0:
+                raise AttributeError("Width can't be negative!")
+        self.__dict__[key] = value
+        if key == 'height':
+            if not value:
+                raise AttributeError("Height can't be empty")
+            elif not isinstance(value, int):
+                raise AttributeError("Height must be int!")
+            elif int(value) <= 0:
+                raise AttributeError("Height can't be negative!")
+        self.__dict__[key] = value
 
     def draw(self):
         if self.color == 'black':
@@ -53,12 +84,12 @@ class Rectangle:
 
 
 class Engine2D:
-    canvas = []
 
     def __init__(self):
+        self.canvas = []
         self.color = 'black'
 
-    def __str__(self):
+    def __repr__(self):
         return f'Canvas with figures: {self.canvas}'
 
     def add_figures(self, *figures):
@@ -80,9 +111,9 @@ if __name__ == '__main__':
     engine = Engine2D()
 
     print('***color - default - black***')
-    triangle = Triangle(1, 1, 2, 3, 4, 5)
+    triangle = Triangle(1, 1, 2, 1, 2, 12)
     circle = Circle(0, 0, 1)
-    rectangle = Rectangle(0, 0, 1, 2)
+    rectangle = Rectangle(0, 0, 2, 2)
     engine.add_figures(triangle, circle, rectangle)
     engine.add_figures(triangle)
     print(engine)
@@ -93,7 +124,7 @@ if __name__ == '__main__':
     circle_yellow = Circle(10, 10, 11)
     rectangle_yellow = Rectangle(110, 110, 111, 112)
     engine.add_figures(triangle_yellow, circle_yellow, rectangle_yellow)
-    print(engine)
+    print(engine.canvas)
 
     print('\n***color - white***')
     engine.set_color('white')
@@ -103,3 +134,5 @@ if __name__ == '__main__':
 
     print('\n***cleans***')
     engine.draw()
+    print(engine.canvas)
+
